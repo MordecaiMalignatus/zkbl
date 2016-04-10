@@ -7,6 +7,18 @@ defmodule Zkbl do
     |> interpret_ast
   end
 
+  @doc """
+  Turns an input string of Lisp into nested lists ready for parsing.
+
+    ## Examples
+
+      iex> Zkbl.parse_lisp "((foo) bar)"
+      {:ok, [["foo"], "bar"]}
+
+      iex> Zkbl.parse_lisp "(kills (corp 'Fweddit'))"
+      {:ok, ["kills", ["corp", "'Fweddit'"]]}
+
+  """
   def parse_lisp(string) do
     String.replace(string, ")", " ) ")
     |> String.replace("(", " ( ")
