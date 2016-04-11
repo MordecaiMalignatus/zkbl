@@ -74,14 +74,43 @@ defmodule Zkbl do
 
     ## Examples
     iex> Zkbl.reconstruct_strings ["'Foo", "Bar'"]
-    ["'Foo Bar'"]
+    {:ok, ["'Foo Bar'"]}
 
     iex> Zkbl.reconstruct_strings ["'Terrible", "Terrible", "Damage'"]
-    ["'Terrible Terrible Damage'"]
+    {:ok, ["'Terrible Terrible Damage'"]}
   """
   @spec reconstruct_strings([String.t]) :: [String.t]
-  def reconstruct_strings(ast) do
-    ast
+  def reconstruct_strings(ast) when is_list(ast) do
+    {:ok, reconstruct_strings_acc(ast, [])}
+  end
+
+  defp reconstruct_strings_acc([], acc) do
+    acc
+  end
+
+  defp reconstruct_strings_acc([head | tail], acc) do
+    case String.starts_with?(head, "'") do
+      false -> reconstruct_strings_acc(tail, acc ++ [head])
+      true  ->
+        {reconstructed, leftovers} = accumulate_string([head | tail], [])
+        reconstruct_strings_acc(leftovers, acc ++ [reconstructed])
+    end
+  end
+
+  defp accumulate_string([], _) do
+    raise "Missing quotation mark in expression"
+  end
+
+  defp accumulate_string([head | tail], acc) do
+    cond do
+      String.ends_with?(head, "'") ->
+        joined = acc ++ [head]
+                 |> Enum.join(" ")
+
+        {joined, tail}
+      true ->
+        accumulate_string(tail, acc ++ [head])
+    end
   end
 
   def interpret_ast(ast) do
