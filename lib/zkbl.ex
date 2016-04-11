@@ -50,6 +50,9 @@ defmodule Zkbl do
     {:error, "Not a Lisp Expression. Must start with an open parens: '('"}
   end
 
+  def make_sexp(_) do
+    {:error, "Must pass a list in order to actually parse lisp."}
+  end
 
   @spec make_sexp_acc([String.t], [String.t]) :: {[String.t], [String.t]}
   defp make_sexp_acc(["("| tail], acc) do
@@ -65,6 +68,21 @@ defmodule Zkbl do
     make_sexp_acc(tail, acc ++ [head])
   end
 
+  @doc """
+  This function reconstructs the strings between '' or "" that got broken during
+  my naive tokenification.
+
+    ## Examples
+    iex> Zkbl.reconstruct_strings ["'Foo", "Bar'"]
+    ["'Foo Bar'"]
+
+    iex> Zkbl.reconstruct_strings ["'Terrible", "Terrible", "Damage'"]
+    ["'Terrible Terrible Damage'"]
+  """
+  @spec reconstruct_strings([String.t]) :: [String.t]
+  def reconstruct_strings(ast) do
+    ast
+  end
 
   def interpret_ast(ast) do
     ast
