@@ -18,6 +18,9 @@ defmodule Zkbl do
       iex> Zkbl.parse_lisp "(kills (corp 'Fweddit'))"
       {:ok, ["kills", ["corp", "'Fweddit'"]]}
 
+      iex> Zkbl.parse_lisp "(kills (alliance 'White Legion.'))"
+      {:ok, ["kills", ["alliance","'White Legion.'"]]}
+
   """
   def parse_lisp(string) do
     String.replace(string, ")", " ) ")
@@ -43,6 +46,7 @@ defmodule Zkbl do
   @spec make_sexp([String.t]) :: {atom, sexp} | {atom, String.t}
   def make_sexp(["(" | tail]) do
     {result, _} = make_sexp_acc(tail, [])
+    result = reconstruct_strings!(result)
     {:ok, result}
   end
 
@@ -73,35 +77,39 @@ defmodule Zkbl do
   my naive tokenification.
 
     ## Examples
-    iex> Zkbl.reconstruct_strings ["'Foo", "Bar'"]
-    {:ok, ["'Foo Bar'"]}
+    iex> Zkbl.reconstruct_strings! ["'Foo", "Bar'"]
+    ["'Foo Bar'"]
 
-    iex> Zkbl.reconstruct_strings ["'Terrible", "Terrible", "Damage'"]
-    {:ok, ["'Terrible Terrible Damage'"]}
+    iex> Zkbl.reconstruct_strings! ["'Terrible", "Terrible", "Damage'"]
+    ["'Terrible Terrible Damage'"]
   """
-  @spec reconstruct_strings([String.t]) :: [String.t]
-  def reconstruct_strings(ast) when is_list(ast) do
-    {:ok, reconstruct_strings_acc(ast, [])}
+  @spec reconstruct_strings!([String.t]) :: {atom, [String.t]}
+  def reconstruct_strings!(ast) do
+    reconstruct_strings_acc(ast, [])
   end
 
   defp reconstruct_strings_acc([], acc) do
     acc
   end
 
+  defp reconstruct_strings_acc([head | tail], acc) when is_list(head) do
+    reconstruct_strings_acc(tail, acc ++ [reconstruct_strings_acc(head, [])])
+  end
+
   defp reconstruct_strings_acc([head | tail], acc) do
     case String.starts_with?(head, "'") do
       false -> reconstruct_strings_acc(tail, acc ++ [head])
       true  ->
-        {reconstructed, leftovers} = accumulate_string([head | tail], [])
+        {reconstructed, leftovers} = accumulate_string!([head | tail], [])
         reconstruct_strings_acc(leftovers, acc ++ [reconstructed])
     end
   end
 
-  defp accumulate_string([], _) do
+  defp accumulate_string!([], _) do
     raise "Missing quotation mark in expression"
   end
 
-  defp accumulate_string([head | tail], acc) do
+  defp accumulate_string!([head | tail], acc) do
     cond do
       String.ends_with?(head, "'") ->
         joined = acc ++ [head]
@@ -109,7 +117,7 @@ defmodule Zkbl do
 
         {joined, tail}
       true ->
-        accumulate_string(tail, acc ++ [head])
+        accumulate_string!(tail, acc ++ [head])
     end
   end
 

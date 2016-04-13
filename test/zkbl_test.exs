@@ -43,20 +43,20 @@ defmodule ZkblTest do
     test = ["'foo", "bar'"]
     expected = ["'foo bar'"]
 
-    assert Zkbl.reconstruct_strings(test) == {:ok, expected}
+    assert Zkbl.reconstruct_strings!(test) == expected
   end
 
   test "Reconstruction of strings when there is nothing to do" do
     test = ["Foo"]
     expected = ["Foo"]
 
-    assert Zkbl.reconstruct_strings(test) == {:ok, expected}
+    assert Zkbl.reconstruct_strings!(test) == expected
   end
 
   test "Reconstruction of more complex things" do
     test = ["'Foo", "bar", "baz'"]
     expected = ["'Foo bar baz'"]
 
-    assert Zkbl.reconstruct_strings(test) == {:ok, expected}
+    assert Zkbl.reconstruct_strings!(test) == expected
   end
 end
