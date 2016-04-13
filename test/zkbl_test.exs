@@ -6,31 +6,31 @@ defmodule ZkblTest do
     assert 1 + 1 == 2
   end
 
- test "tokenification" do
+  test "tokenification" do
    str = "(test)"
    expected = ["test"]
 
    assert Zkbl.parse_lisp(str) == {:ok, expected}
- end
+  end
 
- test "tokenification of right-nested sexps" do
-   str = "(test (another-test args1))"
-   expected = ["test", ["another-test", "args1"]]
+  test "tokenification of right-nested sexps" do
+    str = "(test (another-test args1))"
+    expected = ["test", ["another-test", "args1"]]
 
-   assert Zkbl.parse_lisp(str) == {:ok, expected}
+    assert Zkbl.parse_lisp(str) == {:ok, expected}
 
-   str = "(terrible (terrible (terrible (damage))))"
-   expected = ["terrible", ["terrible", ["terrible", ["damage"]]]]
+    str = "(terrible (terrible (terrible (damage))))"
+    expected = ["terrible", ["terrible", ["terrible", ["damage"]]]]
 
-   assert Zkbl.parse_lisp(str) == {:ok, expected}
- end
+    assert Zkbl.parse_lisp(str) == {:ok, expected}
+  end
 
- test "tokenification of left-nested sexps" do
-   str = "((((foobar) foo) bar) qux)"
-   expected = [[[["foobar"], "foo"], "bar"], "qux"]
+  test "tokenification of left-nested sexps" do
+    str = "((((foobar) foo) bar) qux)"
+    expected = [[[["foobar"], "foo"], "bar"], "qux"]
 
-   assert Zkbl.parse_lisp(str) == {:ok, expected}
- end
+    assert Zkbl.parse_lisp(str) == {:ok, expected}
+  end
 
   test "tokenification of complex-ish expressions" do
     str = "(any (kills 'foo') (region :vale))"
@@ -39,24 +39,4 @@ defmodule ZkblTest do
     assert Zkbl.parse_lisp(str) == {:ok, expected}
   end
 
-  test "Reconstruction of simple strings" do
-    test = ["'foo", "bar'"]
-    expected = ["'foo bar'"]
-
-    assert Zkbl.reconstruct_strings!(test) == expected
-  end
-
-  test "Reconstruction of strings when there is nothing to do" do
-    test = ["Foo"]
-    expected = ["Foo"]
-
-    assert Zkbl.reconstruct_strings!(test) == expected
-  end
-
-  test "Reconstruction of more complex things" do
-    test = ["'Foo", "bar", "baz'"]
-    expected = ["'Foo bar baz'"]
-
-    assert Zkbl.reconstruct_strings!(test) == expected
-  end
 end
