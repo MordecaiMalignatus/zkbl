@@ -63,6 +63,9 @@
     acc
   end
 
+  ##
+  # Internal worker function, for nicer API compared to actual workings.
+
   defp reconstruct_strings_acc([head | tail], acc) when is_list(head) do
     reconstruct_strings_acc(tail, acc ++ [reconstruct_strings_acc(head, [])])
   end
@@ -75,6 +78,11 @@
         reconstruct_strings_acc(leftovers, acc ++ [reconstructed])
     end
   end
+
+  ##
+  # Collects a string until it hits a closing apostrophe, because using
+  # Enum.take_while would be far too easy. (And it would not actually
+  # collect the part with the apostrophe.)
 
   defp accumulate_string!([], _) do
     raise "Missing quotation mark in expression"
