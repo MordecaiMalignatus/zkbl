@@ -3,8 +3,9 @@ defmodule Zkbl.Interpreter do
   This is the central interpreter that makes all the filtering happen.
   """
 
+  @spec interpret_ast({atom, [String.t]}) :: {atom, Hashmap}
   def interpret_ast({:ok, ast}) do
-    ast
+    eval_sexp ast
   end
 
   def interpret_ast(t = {:error, _}) do
@@ -14,11 +15,16 @@ defmodule Zkbl.Interpreter do
   @spec eval_sexp([String.t]) :: {atom, [any]} | {atom, String.t}
   def eval_sexp(sexp) do
     # Do nested Sexps first
-    reduced = beta_reduce(sexp)
-    [function | args] = reduced
+    [func_string | args] = beta_reduce(sexp)
+    fun = Zkbl.Stdlib.lookup_function(func_string)
 
+    apply(fun, [args])
   end
 
+  @doc """
+  Beta reduction, as in lambda calculus beta reduction, meaning, it recursively
+  evaluates every nested function call within,
+  """
   @spec beta_reduce([String.t]) :: any
   def beta_reduce(sexp) do
     Enum.map(sexp, fn arg ->
