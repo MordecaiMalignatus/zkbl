@@ -1,4 +1,23 @@
  defmodule Zkbl.Parser do
+  @type sexp :: [String.t]
+
+  @doc """
+  Pipeline function you can pass a raw string of lisp, and have appropriately nested
+  Tokens in lists come out.
+
+  ## Examples
+
+    iex> Zkbl.Parser.parse_lisp "(losses (any (alliance 'White Legion.')))"
+    {:ok, ["losses", ["any", ["alliance", "'White Legion.'"]]]}
+  """
+  def parse_lisp(string) do
+    String.replace(string, ")", " ) ")
+    |> String.replace("(", " ( ")
+    |> String.split(" ")
+    |> Enum.filter(&(&1 != ""))
+    |> Zkbl.Parser.make_sexp
+  end
+
   @doc """
   Takes a flat list of tokens, returns nested list that represent order
   and depth of the input lisp expression.
@@ -12,8 +31,6 @@
     {:ok, ["foo", ["bar"]]}
 
   """
-  @type sexp :: [String.t]
-
   @spec make_sexp([String.t]) :: {atom, sexp} | {atom, String.t}
   def make_sexp(["(" | tail]) do
     {result, _} = make_sexp_acc(tail, [])
@@ -29,6 +46,8 @@
     {:error, "Must pass a list in order to actually parse lisp."}
   end
 
+  # Internal worker function.
+
   @spec make_sexp_acc([String.t], [String.t]) :: {[String.t], [String.t]}
   defp make_sexp_acc(["("| tail], acc) do
     {inner, leftovers} = make_sexp_acc(tail, [])
@@ -42,6 +61,7 @@
   defp make_sexp_acc([head | tail], acc) do
     make_sexp_acc(tail, acc ++ [head])
   end
+
 
   @doc """
   This function reconstructs the strings between '' or "" that got broken during
@@ -59,12 +79,12 @@
     reconstruct_strings_acc(ast, [])
   end
 
+  ##
+  # Internal worker function, for nicer API compared to actual workings.
+
   defp reconstruct_strings_acc([], acc) do
     acc
   end
-
-  ##
-  # Internal worker function, for nicer API compared to actual workings.
 
   defp reconstruct_strings_acc([head | tail], acc) when is_list(head) do
     reconstruct_strings_acc(tail, acc ++ [reconstruct_strings_acc(head, [])])
