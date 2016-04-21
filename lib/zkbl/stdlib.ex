@@ -9,10 +9,13 @@ defmodule Zkbl.Stdlib do
   alias __MODULE__, as: Std
 
   @lib %{
-    "sum" => &Std.sum/1
+    "sum" => &Std.sum/1,
+    "killmail" => &Std.get_kill/1
   }
 
   @doc """
+  This looks up the function string you want from the actual implementation of the
+  stdlib.
   A simple abstraction over a map lookup, for the sakes of nicer interface.
   """
   def lookup_function(function_string) do
@@ -22,9 +25,23 @@ defmodule Zkbl.Stdlib do
     end
   end
 
+  @doc """
+  Tries to convert all of its arguments to numbers, then sums them all up.
+  Will fail on cast if it's arguments are not parsable.
+  """
   def sum(args) do
     Enum.map(args, &custom_int_parse/1)
     |> Enum.reduce(&(&1 + &2))
+  end
+
+  @doc """
+  TODO
+  Az fix this you dumb nerd.
+  """
+  def get_kill(args) do
+    args
+    |> Enum.map(&custom_int_parse/1)
+    |> Enum.map(&Api.Zkb.get_kill/1)
   end
 
   defp custom_int_parse(int_string) do
