@@ -1,6 +1,10 @@
 defmodule Api.Zkb do
   # TODO: This needs to be fanned out to processes.
   @url_root "https://zkillboard.com/api"
+  @headers %{
+    # "Accept-Encoding" => "gzip", have to figure out how to decode gzipped strings.
+    "User-Agent" => "Zkbl/0.1 github.com/az4reus/zkbl"
+  }
 
   @doc """
   Retrieves a singular killID from ZKB.
@@ -16,13 +20,17 @@ defmodule Api.Zkb do
   This is the general-purpose ZKB http getting function, to save typing.
   """
   def get_uri(uri) do
-    HTTPoison.get!(@url_root <> uri)
+    HTTPoison.get!(@url_root <> uri, @headers)
   end
 
   @doc """
   The response parser for HTTPoison responses. Automatically sorts things out
   and only returns :ok when the server replied with 200.
   """
+  def parse_response(%HTTPoison.Response{status_code: 200, body: []}) do
+    {:error, "Reqeusted Resource not found"}
+  end
+
   def parse_response(%HTTPoison.Response{status_code: 200, body: body}) do
     Poison.Parser.parse(body)
   end

@@ -46,6 +46,7 @@
     {:error, "Must pass a list in order to actually parse lisp."}
   end
 
+  ##
   # Internal worker function.
 
   @spec make_sexp_acc([String.t], [String.t]) :: {[String.t], [String.t]}
@@ -100,9 +101,9 @@
   end
 
   ##
-  # Collects a string until it hits a closing apostrophe, because using
+  # Collects a string until it hits a closing apostrophe, because really, using
   # Enum.take_while would be far too easy. (And it would not actually
-  # collect the part with the apostrophe.)
+  # collect the part with the closing apostrophe.)
 
   defp accumulate_string!([], _) do
     raise "Missing quotation mark in expression"
@@ -111,10 +112,9 @@
   defp accumulate_string!([head | tail], acc) do
     cond do
       String.ends_with?(head, "'") ->
-        joined = acc ++ [head]
-                 |> Enum.join(" ")
-
+        joined = acc ++ [head] |> Enum.join(" ")
         {joined, tail}
+
       true ->
         accumulate_string!(tail, acc ++ [head])
     end
