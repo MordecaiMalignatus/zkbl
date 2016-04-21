@@ -2,7 +2,7 @@ defmodule Api.Zkb do
   # TODO: This needs to be fanned out to processes.
   @url_root "https://zkillboard.com/api"
   @headers %{
-    # "Accept-Encoding" => "gzip", have to figure out how to decode gzipped strings.
+    "Accept-Encoding" => "gzip",
     "User-Agent" => "Zkbl/0.1 github.com/az4reus/zkbl"
   }
 
@@ -20,7 +20,8 @@ defmodule Api.Zkb do
   This is the general-purpose ZKB http getting function, to save typing.
   """
   def get_uri(uri) do
-    HTTPoison.get!(@url_root <> uri, @headers)
+    response = HTTPoison.get!(@url_root <> uri, @headers)
+    %HTTPoison.Response{response | :body => :zlib.gunzip(response.body)}
   end
 
   @doc """
