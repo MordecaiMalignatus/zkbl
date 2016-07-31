@@ -16,7 +16,6 @@ defmodule Zkbl.Stdlib do
   @doc """
   This looks up the function string you want from the actual implementation of the
   stdlib.
-  A simple abstraction over a map lookup, for the sakes of nicer interface.
   """
   def lookup_function(function_string) do
     case Map.has_key?(@lib, function_string) do

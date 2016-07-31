@@ -18,6 +18,8 @@ defmodule Api.Zkb do
 
   @doc """
   This is the general-purpose ZKB http getting function, to save typing.
+
+  TODO maybe needs differentiation between gzipped content and non-zipped responses.
   """
   def get_uri(uri) do
     response = HTTPoison.get!(@url_root <> uri, @headers)
