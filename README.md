@@ -1,20 +1,26 @@
 # Zkbl
 
-**TODO: Add description**
+This is, in essence, a bunch of code that makes [zKillboard](https://zkillboard.com) more usable and makes things
+easier to find.
 
-## Installation
+### What it does / will do:
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+Zkbl implements a LISP-like language that serves as query and analysis constructor for Zkb. The end goal is to have
+something like this:
 
-  1. Add zkbl to your list of dependencies in `mix.exs`:
+```clojure
+(losses
+  (group :CFC)
+  (shiptype :battleship)
+  (region :delve))
+```
 
-        def deps do
-          [{:zkbl, "~> 0.0.1"}]
-        end
+And have Zkbl give you all the battleship losses of the alliances associated with the CFC in Delve. There are going
+to be a bunch of functions more, like value limiters and all sorts of filters.
 
-  2. Ensure zkbl is started before your application:
+### But Az, what does it do right now?
 
-        def application do
-          [applications: [:zkbl]]
-        end
-
+```lisp
+(kill 55403284)
+```
+... You're welcome. 
