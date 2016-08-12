@@ -20,7 +20,7 @@ to be a bunch of functions more, like value limiters and all sorts of filters.
 
 ### But Az, what does it do right now?
 
-```lisp
+```clojure
 (kill 55403284)
 ```
 ... You're welcome. 

@@ -7,20 +7,26 @@ defmodule Api.Xml do
     "User-Agent" => "Zkbl/0.1 github.com/az4reus/zkbl"
   }
 
+
+  def id_for_char_name(char_names) when is_list(char_names) do
+    xml = request_uri("/eve/characterID.xml.aspx", names: Enum.join(char_names, ","))
+    :xmerl_xpath.string('//result/rowset/row/@characterID', xml)
+    |> Enum.map(&extract_attribute/1)
+  end
+  
   def id_for_char_name(char_name) do
     xml = request_uri("/eve/characterID.xml.aspx", names: char_name)
     :xmerl_xpath.string('//result/rowset/row/@characterID', xml)
     |> extract_attribute
   end
 
-  defp extract_attribute([xmlAttribute(value: value)]) do
-    List.to_string(value)
-  end
+  defp extract_attribute([xmlAttribute(value: value)]), do: List.to_string(value)
+  defp extract_attribute(xmlAttribute(value: value)), do: List.to_string(value) 
   defp extract_attribute(_), do: nil
     
   ## Internal API functions that are abstracted over. 
 
-  defp request_uri(uri) do
+  def request_uri(uri) do
     HTTPoison.get(@url_root <> uri, @headers)
     |> parse_response
   end
