@@ -5,6 +5,7 @@ defmodule Api.Zkb do
     "Accept-Encoding" => "gzip",
     "User-Agent" => "Zkbl/0.1 github.com/az4reus/zkbl"
   }
+  @httpOptions [follow_redirect: true]
 
   @doc """
   Retrieves a singular killID from ZKB.
@@ -17,12 +18,21 @@ defmodule Api.Zkb do
   end
 
   @doc """
+  Retrieves recent kills of any given character ID. This is a thin wrapper
+  that relies on correct information fed to it.
+  """
+  def get_player_kills(player_ids) do
+    get_uri("/kills/characterID/#{Enum.join(player_ids,",")}")
+    |> parse_response
+  end
+
+  @doc """
   This is the general-purpose ZKB http getting function, to save typing.
 
   TODO maybe needs differentiation between gzipped content and non-zipped responses.
   """
   def get_uri(uri) do
-    response = HTTPoison.get!(@url_root <> uri, @headers)
+    response = HTTPoison.get!(@url_root <> uri, @headers, @httpOptions)
     %HTTPoison.Response{response | :body => :zlib.gunzip(response.body)}
   end
 

@@ -10,7 +10,8 @@ defmodule Zkbl.Stdlib do
 
   @lib %{
     "sum" => &Std.sum/1,
-    "killmail" => &Std.get_kill/1
+    "killmail" => &Std.get_kill/1,
+    "player-kills" => &Std.get_player_kills/1
   }
 
   @doc """
@@ -35,6 +36,16 @@ defmodule Zkbl.Stdlib do
   def sum(args) do
     Enum.map(args, &custom_int_parse/1)
     |> Enum.reduce(&(&1 + &2))
+  end
+
+  @doc """
+  Tries to convert all given `args` to numbers, and uses those as CharacterIDs
+  to query ZKB with for player kills.
+  """
+  def get_player_kills(args) do
+    args
+    |> Enum.map(&custom_int_parse/1)
+    |> Api.Zkb.get_player_kills
   end
 
   @doc """
