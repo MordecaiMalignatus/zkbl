@@ -27,6 +27,10 @@ defmodule Zkbl.Stdlib do
   @doc """
   Tries to convert all of its arguments to numbers, then sums them all up.
   Will fail on cast if it's arguments are not parsable.
+
+  ## Examples
+    iex> Zkbl.evaluate_lisp "(sum 1 2 3 4)"
+    10
   """
   def sum(args) do
     Enum.map(args, &custom_int_parse/1)
